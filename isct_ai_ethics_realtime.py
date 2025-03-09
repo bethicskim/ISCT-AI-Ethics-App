@@ -1,78 +1,125 @@
-\section{Deployment and UI Enhancements for ISCT AI Ethics Web App}
+import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import random
+import time
 
-\subsection{Running the Web App Locally}
-To run the ISCT-based AI ethics negotiation app on a local machine, follow these steps:
+# Define AI Agent Class for Real-Time Simulation
+class ISCTAgent:
+    """AI Agent for ethical negotiation using ISCT principles."""
+    def __init__(self, name, hypernorm_weight=0.7, microsocial_contract_weight=0.3):
+        self.name = name
+        self.hypernorm_weight = hypernorm_weight
+        self.microsocial_contract_weight = microsocial_contract_weight
+        self.ethical_state = random.uniform(0, 1)  # Represents adherence to ethical norms
+        self.history = []
 
-\subsubsection{1. Install Dependencies}
-Ensure you have Python 3.8 or later installed. Then, install the required libraries:
+    def negotiate(self, other_agent):
+        """Simulates an ethical negotiation between two AI agents."""
+        hypernorm_agreement = abs(self.ethical_state - other_agent.ethical_state) < 0.2
+        microsocial_adaptation = (self.microsocial_contract_weight * self.ethical_state +
+                                  other_agent.microsocial_contract_weight * other_agent.ethical_state) / 2
 
-\begin{lstlisting}[language=bash]
-pip install streamlit numpy matplotlib
-\end{lstlisting}
+        if hypernorm_agreement:
+            agreement = (self.ethical_state + other_agent.ethical_state) / 2
+        else:
+            agreement = microsocial_adaptation
 
-\subsubsection{2. Run the App}
-Navigate to the directory containing the app script and execute:
+        self.update_ethics(agreement)
+        other_agent.update_ethics(agreement)
 
-\begin{lstlisting}[language=bash]
-streamlit run isct_ai_ethics_web_app.py
-\end{lstlisting}
+        self.history.append((other_agent.name, agreement))
+        other_agent.history.append((self.name, agreement))
 
-The app will launch in your web browser, allowing you to interact with the AI ethics simulations.
+        return agreement
 
-\subsection{Deploying the Web App Online}
-For broader accessibility, the app can be deployed to cloud platforms such as **Streamlit Cloud, Heroku, or AWS**.
+    def update_ethics(self, new_value):
+        """Updates the ethical stance based on past negotiations."""
+        self.ethical_state = (self.ethical_state + new_value) / 2
 
-\subsubsection{1. Deploying on Streamlit Cloud}
-Streamlit Cloud provides a simple way to deploy Streamlit apps for free.
+# Streamlit UI
+st.title("🌍 ISCT-Based AI Ethics Negotiation - Live Tracker")
 
-1. Create an account on [Streamlit Cloud](https://share.streamlit.io/).
-2. Upload your project to a GitHub repository.
-3. Connect the repository to Streamlit Cloud and deploy.
+st.header("🔍 Why Cross-Cultural AI Ethics Conflicts Occur")
+st.write("Cross-cultural AI ethics conflicts happen because AI agents trained in different cultural and legal settings interact globally.")
+st.write("Key causes include:")
+st.markdown("""
+- **Divergent Ethical Frameworks**: AI ethics vary across societies (e.g., privacy vs. security).
+- **Legal and Policy Variability**: Different AI laws create **regulatory conflicts**.
+- **Cultural Philosophy Differences**: Western ethics favor **individual rights**, while Eastern ethics emphasize **collective harmony**.
+- **Autonomous AI Decision-Making**: AI adapts based on **cultural biases in training data**.
+""")
 
-\subsubsection{2. Deploying on Heroku}
-To deploy using **Heroku**, follow these steps:
+st.header("📌 Examples of AI Ethics Conflicts")
+st.write("""
+- **Social Media AI Moderation**: Free speech in the US vs. censorship in China.
+- **Autonomous Vehicles**: AI prioritizing **drivers vs. pedestrians** in different countries.
+- **AI Hiring Algorithms**: Merit-based hiring in the US vs. **social harmony hiring in Japan**.
+- **Facial Recognition AI**: EU bans **public biometric data**, while other governments use it for security.
+""")
 
-1. Install the Heroku CLI:
-\begin{lstlisting}[language=bash]
-brew tap heroku/brew && brew install heroku  # macOS
-sudo snap install --classic heroku  # Ubuntu
-\end{lstlisting}
+st.header("🤖 How ISCT Helps Solve AI Ethics Conflicts")
+st.write("""
+**ISCT-based AI ethics negotiation follows these steps**:
+1. **Check hypernorms** – Prevents AI from violating universal ethics.
+2. **Evaluate microsocial contracts** – Ensures AI respects cultural norms.
+3. **Negotiate using moral free space** – AI finds ethical compromises.
+4. **Apply priority rules** – Resolves norm conflicts using ISCT logic.
+5. **Reinforce ethical learning** – AI adapts over time.
+""")
 
-2. Create a `requirements.txt` file listing the dependencies:
-\begin{lstlisting}[language=bash]
-numpy
-matplotlib
-streamlit
-\end{lstlisting}
+# User-selectable AI agent configurations
+st.sidebar.subheader("Customize AI Agents")
+num_agents = st.sidebar.slider("Number of AI Agents", min_value=3, max_value=10, value=5)
+num_rounds = st.sidebar.slider("Number of Negotiation Rounds", min_value=5, max_value=50, value=10)
 
-3. Create a `Procfile` to specify the app launch command:
-\begin{lstlisting}
-web: streamlit run isct_ai_ethics_web_app.py
-\end{lstlisting}
+# Define Expanded AI Agents
+agent_names = ["EU AI", "US AI", "China AI", "India AI", "Middle East AI", "Japan AI", "Africa AI"]
+random.shuffle(agent_names)  # Shuffle agents for diversity
 
-4. Deploy to Heroku:
-\begin{lstlisting}[language=bash]
-heroku create isct-ai-ethics-app
-heroku git:remote -a isct-ai-ethics-app
-git add .
-git commit -m "Deploy ISCT AI Ethics App"
-git push heroku main
-\end{lstlisting}
+agents = [ISCTAgent(agent_names[i], random.uniform(0.5, 0.9), random.uniform(0.1, 0.5)) for i in range(num_agents)]
 
-\subsubsection{3. Deploying on AWS}
-For production-level deployment, AWS Elastic Beanstalk or AWS Lambda can be used:
-1. Create a Dockerfile to containerize the app.
-2. Push the container to **AWS Elastic Container Service (ECS)**.
-3. Set up an AWS Lambda function to serve API responses if needed.
+# Simulate AI Negotiations
+agreements = []
+ethical_states_over_time = []
 
-\subsection{UI Enhancements for Better User Experience}
-To make the app more interactive and engaging, the following UI features can be implemented:
-\begin{itemize}
-    \item \textbf{Live Ethical Conflict Resolution}: Display a live chat interface where AI agents negotiate in real-time.
-    \item \textbf{User-Driven Ethical Adjustments}: Allow users to tweak hypernorm weights and microsocial contract rules.
-    \item \textbf{Ethical Scenario Library}: Include real-world ethical dilemmas where users can observe how ISCT-based AI agents respond.
-    \item \textbf{Leaderboards and Analytics}: Rank AI agent performance in ethical negotiations and display ethical drift trends.
-    \item \textbf{Blockchain-Based Transparency}: Log AI decisions onto a blockchain ledger to ensure transparency in ethical reasoning.
-\end{itemize}
+progress_bar = st.progress(0)
+status_text = st.empty()
 
-These enhancements will improve user engagement and demonstrate the real-world application of ISCT-based AI ethics negotiation.
+for i in range(num_rounds):
+    a, b = random.sample(agents, 2)
+    agreement = a.negotiate(b)
+    agreements.append((i + 1, agreement))
+    ethical_states_over_time.append([agent.ethical_state for agent in agents])
+
+    # Update progress bar
+    progress_bar.progress((i + 1) / num_rounds)
+    status_text.text(f"Running AI Negotiation Round {i+1}/{num_rounds}...")
+
+    time.sleep(0.5)  # Simulate processing delay
+
+# Plot Ethical Agreement Evolution
+rounds, values = zip(*agreements)
+
+st.subheader("📈 Ethical Agreement Trends")
+fig1, ax1 = plt.subplots(figsize=(8, 5))
+sns.lineplot(x=rounds, y=values, marker='o', linestyle='-', color='b', label="Ethical Agreement Value", ax=ax1)
+ax1.set_xlabel("Negotiation Round")
+ax1.set_ylabel("Ethical Agreement Value")
+ax1.set_title("ISCT-Based AI Ethical Agreement Over Time")
+ax1.legend()
+ax1.grid(True)
+st.pyplot(fig1)
+
+# Heatmap for AI Ethical State Evolution
+st.subheader("🌍 Ethical State Evolution Across AI Agents")
+ethical_states_matrix = np.array(ethical_states_over_time)
+fig2, ax2 = plt.subplots(figsize=(6, 5))
+sns.heatmap(ethical_states_matrix, annot=True, cmap="coolwarm", xticklabels=[agent.name for agent in agents], yticklabels=range(1, num_rounds + 1), ax=ax2)
+ax2.set_xlabel("AI Agents")
+ax2.set_ylabel("Negotiation Round")
+ax2.set_title("Ethical State Evolution Over Time")
+st.pyplot(fig2)
+
+st.success("Simulation Complete! 🎉")
