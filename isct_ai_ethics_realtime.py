@@ -17,66 +17,17 @@ before launching a joint **international AI-powered business project**. It demon
 - How **AI decision-making differs** across cultures.
 - How **global AI teams can find common ethical ground**.
 - The role of **ISCT (Integrative Social Contracts Theory)** in resolving ethical conflicts.
-
-This app allows you to **adjust AI ethical priorities** and observe how they negotiate over time. 
-The graphs will show how their **agreements evolve** and **which AI systems build trust** for long-term collaboration.
 """)
 
 # ==============================
-# 🔍 Why Do AI Ethics Conflicts Occur?
+# 🏛️ AI Personalities & Hypernorm Priorities
 # ==============================
-st.header("🔍 Why Do AI Ethics Conflicts Occur?")
-st.write("""
-Cross-cultural AI ethics conflicts happen because AI agents are trained in different **legal, social, and business environments**.
-Some AIs may prioritize **profit and innovation**, while others focus on **ethics, privacy, and governance**.
+st.sidebar.subheader("🎭 Choose AI Personality Type")
+ai_personality = st.sidebar.selectbox(
+    "AI Negotiation Style",
+    ["Balanced", "Aggressive", "Cooperative"]
+)
 
-For example:
-- **US AI (Silicon Valley AI Corp.)** prefers **free-market innovation** and **data-sharing**.
-- **EU AI (European AI Consortium)** prioritizes **strict privacy laws like GDPR**.
-- **China AI (State AI Initiative)** follows **government-controlled AI policies**.
-- **Japan AI (Tech Ethics Board)** values **trust and long-term stability**.
-
-When these AIs collaborate on a business deal, they **must negotiate ethical compromises** before forming an agreement.
-""")
-
-# ==============================
-# 🛠️ How the Simulation Works: Step-by-Step
-# ==============================
-st.header("🛠️ How the AI Business Ethics Simulation Works")
-st.write("""
-This simulation follows **four key steps**:
-
-### **Step 1: AI Agents Enter Negotiation**
-Each AI starts with **a unique set of ethical priorities**:
-- **Data Sharing**
-- **Regulation Compliance**
-- **Profit vs. Social Good**
-- **Governance**
-
-Each AI also follows **Hypernorms** (universal ethical values):
-- **Fairness**
-- **Transparency**
-- **Privacy**
-- **Accountability**
-- **Cultural Respect**
-
-### **Step 2: AI Agents Propose Initial Terms**
-Each AI suggests **an ideal business deal** based on its priorities.
-If **ethical conflicts arise**, AI agents begin negotiations.
-
-### **Step 3: AI Agents Adjust Based on Negotiation**
-- If AI agents **agree on terms**, they move forward.
-- If disagreements exist, AI **compromises** using **ISCT priority rules**.
-- If no agreement is reached, a **Mediator AI** is introduced.
-
-### **Step 4: Final Agreement or Business Failure**
-- If AI agents reach an **ethical consensus**, they **proceed with business collaboration**.
-- If they fail, the **business deal collapses** due to ethical misalignment.
-""")
-
-# ==============================
-# 🔄 Adjust AI Ethical Priorities
-# ==============================
 st.header("🔄 Adjust AI Ethical Priorities")
 st.write("Modify how AI agents prioritize different ethical principles before negotiations start.")
 
@@ -93,22 +44,57 @@ num_agents = st.sidebar.slider("Number of AI Agents", min_value=3, max_value=10,
 num_years = st.sidebar.slider("Simulation Duration (Years)", min_value=1, max_value=10, value=5)
 
 # ==============================
+# 🤖 AI Agent Class with Personalities
+# ==============================
+class ISCTBusinessAI:
+    """AI Agent for ethical negotiation using ISCT principles."""
+    def __init__(self, name, personality, hypernorm_weights):
+        self.name = name
+        self.personality = personality
+        self.hypernorm_weights = hypernorm_weights
+        self.history = []
+        self.trust_score = random.uniform(0.5, 1.0)
+    
+    def negotiate(self, other_agent):
+        """AI Negotiation using hypernorm-based scoring."""
+        if self.personality == "Aggressive":
+            agreement_score = max(0, 1 - abs(self.trust_score - other_agent.trust_score) * 0.5)
+        elif self.personality == "Cooperative":
+            agreement_score = min(1, (self.trust_score + other_agent.trust_score) / 1.8)
+        else:  # Balanced
+            agreement_score = (self.trust_score + other_agent.trust_score) / 2
+        
+        self.trust_score += random.uniform(-0.05, 0.1)
+        other_agent.trust_score += random.uniform(-0.05, 0.1)
+
+        self.history.append((other_agent.name, agreement_score))
+        other_agent.history.append((self.name, agreement_score))
+
+        return agreement_score
+    
+    def explain_decision(self):
+        """Generates a human-readable explanation of AI's negotiation decision."""
+        return f"{self.name} ({self.personality}) negotiated with {len(self.history)} AI partners, focusing on fairness ({self.hypernorm_weights['fairness']}), transparency ({self.hypernorm_weights['transparency']}), and privacy ({self.hypernorm_weights['privacy']})."
+
+# ==============================
 # 🎯 Run the AI Business Ethics Simulation
 # ==============================
 st.subheader("🎯 Run the AI Business Ethics Simulation")
 st.write("Watch AI agents negotiate ethical business agreements over time.")
 
+# Define AI Agents
+agent_names = ["US AI", "EU AI", "China AI", "India AI", "Japan AI", "Middle East AI", "Africa AI"]
+random.shuffle(agent_names)
+
+agents = [ISCTBusinessAI(agent_names[i], ai_personality, hypernorm_priorities) for i in range(num_agents)]
+
 progress_bar = st.progress(0)
 agreements_over_years = []
-trust_scores = {agent_name: random.uniform(0.5, 1.0) for agent_name in ["US AI", "EU AI", "China AI", "Japan AI"]}
 
 for year in range(1, num_years + 1):
     yearly_agreements = [random.uniform(0.4, 0.9) for _ in range(num_agents)]
     avg_agreement = np.mean(yearly_agreements)
     agreements_over_years.append((year, avg_agreement))
-    
-    for agent in trust_scores:
-        trust_scores[agent] += random.uniform(-0.05, 0.1)  # AI trust evolves
 
     progress_bar.progress(year / num_years)
     time.sleep(0.5)
@@ -128,28 +114,21 @@ ax1.grid(True)
 st.pyplot(fig1)
 
 # ==============================
-# 🔥 Ethical Conflict Heatmap
+# 📜 AI Negotiation Summaries
 # ==============================
-st.subheader("🔥 Ethical Conflict Heatmap")
-heatmap_data = np.random.rand(num_years, num_agents)
-fig2, ax2 = plt.subplots(figsize=(8, 5))
-sns.heatmap(heatmap_data, cmap="coolwarm", annot=True, ax=ax2)
-ax2.set_xlabel("AI Agents")
-ax2.set_ylabel("Years")
-ax2.set_title("AI Ethical Conflicts Over Time")
-st.pyplot(fig2)
+st.subheader("📜 AI Negotiation Summaries")
+for agent in agents:
+    st.write(agent.explain_decision())
 
 # ==============================
-# 🏛️ AI Trust Score Evolution
+# 💬 AI Chat: Ask AI About Its Decisions
 # ==============================
-st.subheader("🏛️ AI Trust Score Over Time")
-fig3, ax3 = plt.subplots(figsize=(8, 5))
-sns.lineplot(x=years, y=list(trust_scores.values()), marker='o', linestyle='-', color='purple', label="Trust Score", ax=ax3)
-ax3.set_xlabel("Years")
-ax3.set_ylabel("Trust Score (0-1)")
-ax3.set_title("AI Trust Score Evolution")
-ax3.legend()
-ax3.grid(True)
-st.pyplot(fig3)
+st.subheader("💬 Ask AI About Its Decisions")
+user_input = st.text_input("Ask an AI agent about its negotiation strategy:")
+
+if user_input:
+    chosen_agent = random.choice(agents)
+    response = f"🤖 {chosen_agent.name} says: '{chosen_agent.explain_decision()}'"
+    st.write(response)
 
 st.success("Simulation Complete! 🎉 AI systems have finished negotiating.")
