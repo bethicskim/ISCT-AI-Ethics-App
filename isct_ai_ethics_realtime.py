@@ -1,134 +1,119 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import random
 import time
 
 # ==============================
-# 🌍 Detailed Explanations: How This AI Simulation Works
+# 🌍 ISCT AI Ethics Simulation for Students
 # ==============================
-st.title("🌍 ISCT AI Business Ethics Negotiation Simulation")
+st.title("🌍 ISCT AI Business Ethics Learning Simulation")
 
 st.header("📢 Understanding This Simulation")
 st.write("""
-This simulation models **how AI agents from different countries and businesses negotiate ethical agreements** 
-before launching a joint **international AI-powered business project**. It demonstrates:
-- How **AI decision-making differs** across cultures.
-- How **global AI teams can find common ethical ground**.
-- The role of **ISCT (Integrative Social Contracts Theory)** in resolving ethical conflicts.
+This simulation helps students understand **how AI uses ISCT (Integrative Social Contracts Theory) 
+to resolve ethical conflicts** in business negotiations.  
+- **Step-by-step learning mode** explains each AI decision.  
+- **Case studies allow students to test ISCT in real-world dilemmas.**  
+- **AI debate mode lets students argue ethical cases with AI.**  
 """)
 
 # ==============================
-# 🏛️ AI Personalities & Hypernorm Priorities
+# 🏛️ Select a Case Study Mode
 # ==============================
-st.sidebar.subheader("🎭 Choose AI Personality Type")
-ai_personality = st.sidebar.selectbox(
-    "AI Negotiation Style",
-    ["Balanced", "Aggressive", "Cooperative"]
+st.sidebar.header("📌 Choose a Case Study")
+case_study = st.sidebar.selectbox(
+    "Select a Real-World Ethical Scenario:",
+    ["AI in Hiring", "AI in Healthcare", "AI & Free Speech"]
 )
 
+# Explanation for the selected case study
+if case_study == "AI in Hiring":
+    st.write("👥 **AI in Hiring**: Should AI prioritize diversity or pure merit?")
+elif case_study == "AI in Healthcare":
+    st.write("🏥 **AI in Healthcare**: Should AI share patient data for public health?")
+elif case_study == "AI & Free Speech":
+    st.write("📰 **AI & Free Speech**: Should AI platforms remove harmful content or protect free expression?")
+
+# ==============================
+# 🎛️ Adjust AI Ethical Priorities
+# ==============================
 st.header("🔄 Adjust AI Ethical Priorities")
 st.write("Modify how AI agents prioritize different ethical principles before negotiations start.")
 
-hypernorm_priorities = {
-    "fairness": st.slider("Fairness Priority", 0.0, 1.0, 0.8),
-    "transparency": st.slider("Transparency Priority", 0.0, 1.0, 0.7),
-    "privacy": st.slider("Privacy Priority", 0.0, 1.0, 0.9),
-    "accountability": st.slider("Accountability Priority", 0.0, 1.0, 0.6),
-    "cultural_respect": st.slider("Cultural Respect Priority", 0.0, 1.0, 0.75),
+hypernorms = {
+    "fairness": 1.0,  # Strictly enforced
+    "transparency": 1.0,  
+    "privacy": 1.0,  
+    "accountability": 1.0,  
+    "cultural_respect": 1.0  
 }
 
-st.sidebar.subheader("⚙️ Simulation Settings")
-num_agents = st.sidebar.slider("Number of AI Agents", min_value=3, max_value=10, value=5)
-num_years = st.sidebar.slider("Simulation Duration (Years)", min_value=1, max_value=10, value=5)
+micro_norms = {
+    "data_sharing": st.slider("Data Sharing Preference", 0.0, 1.0, 0.5),
+    "regulation": st.slider("Regulation Strictness", 0.0, 1.0, 0.5),
+    "profit_focus": st.slider("Profit vs. Social Responsibility", 0.0, 1.0, 0.5),
+    "governance": st.slider("Democratic vs. Centralized Governance", 0.0, 1.0, 0.5),
+}
 
 # ==============================
-# 🤖 AI Agent Class with Personalities
+# 🤖 AI Agent Class with ISCT Step-by-Step Learning
 # ==============================
 class ISCTBusinessAI:
-    """AI Agent for ethical negotiation using ISCT principles."""
-    def __init__(self, name, personality, hypernorm_weights):
+    """AI Agent that strictly follows ISCT principles."""
+    def __init__(self, name, hypernorm_weights, micro_norm_weights):
         self.name = name
-        self.personality = personality
         self.hypernorm_weights = hypernorm_weights
+        self.micro_norm_weights = micro_norm_weights
         self.history = []
         self.trust_score = random.uniform(0.5, 1.0)
-    
+
+    def check_hypernorms(self, other_agent):
+        """Check if the agreement violates ISCT hypernorms."""
+        for hypernorm in self.hypernorm_weights.keys():
+            if abs(self.micro_norm_weights[hypernorm] - other_agent.micro_norm_weights[hypernorm]) > 0.5:
+                return hypernorm
+        return None
+
     def negotiate(self, other_agent):
-        """AI Negotiation using hypernorm-based scoring."""
-        if self.personality == "Aggressive":
-            agreement_score = max(0, 1 - abs(self.trust_score - other_agent.trust_score) * 0.5)
-        elif self.personality == "Cooperative":
-            agreement_score = min(1, (self.trust_score + other_agent.trust_score) / 1.8)
-        else:  # Balanced
-            agreement_score = (self.trust_score + other_agent.trust_score) / 2
+        """Step-by-step AI decision-making process for students."""
         
-        self.trust_score += random.uniform(-0.05, 0.1)
-        other_agent.trust_score += random.uniform(-0.05, 0.1)
+        st.write(f"🤖 **{self.name} is reviewing the agreement...**")
+        time.sleep(1)
 
-        self.history.append((other_agent.name, agreement_score))
-        other_agent.history.append((self.name, agreement_score))
+        violation = self.check_hypernorms(other_agent)
+        if violation:
+            return f"❌ {self.name} rejected the agreement due to a {violation.upper()} violation."
 
-        return agreement_score
-    
-    def explain_decision(self):
-        """Generates a human-readable explanation of AI's negotiation decision."""
-        return f"{self.name} ({self.personality}) negotiated with {len(self.history)} AI partners, focusing on fairness ({self.hypernorm_weights['fairness']}), transparency ({self.hypernorm_weights['transparency']}), and privacy ({self.hypernorm_weights['privacy']})."
+        st.write(f"✅ **{self.name} has approved the agreement.**")
+        return f"✅ {self.name} and {other_agent.name} reached an agreement."
 
 # ==============================
-# 🎯 Run the AI Business Ethics Simulation
+# 🎯 Run the Step-by-Step AI Business Ethics Simulation
 # ==============================
-st.subheader("🎯 Run the AI Business Ethics Simulation")
-st.write("Watch AI agents negotiate ethical business agreements over time.")
+st.subheader("🎯 Step-by-Step AI Business Ethics Negotiation")
 
 # Define AI Agents
-agent_names = ["US AI", "EU AI", "China AI", "India AI", "Japan AI", "Middle East AI", "Africa AI"]
-random.shuffle(agent_names)
+agents = [
+    ISCTBusinessAI("US AI", hypernorms, micro_norms),
+    ISCTBusinessAI("EU AI", hypernorms, micro_norms),
+]
 
-agents = [ISCTBusinessAI(agent_names[i], ai_personality, hypernorm_priorities) for i in range(num_agents)]
-
-progress_bar = st.progress(0)
-agreements_over_years = []
-
-for year in range(1, num_years + 1):
-    yearly_agreements = [random.uniform(0.4, 0.9) for _ in range(num_agents)]
-    avg_agreement = np.mean(yearly_agreements)
-    agreements_over_years.append((year, avg_agreement))
-
-    progress_bar.progress(year / num_years)
-    time.sleep(0.5)
+if st.button("Start Step-by-Step Simulation"):
+    a, b = random.sample(agents, 2)
+    result = a.negotiate(b)
+    st.write(result)
 
 # ==============================
-# 📈 Display Business Agreement Trends Over Time
+# 💬 AI Debate Mode: Students vs. AI
 # ==============================
-st.subheader("📈 AI Business Ethics Agreement Over Time")
-years, agreement_scores = zip(*agreements_over_years)
-fig1, ax1 = plt.subplots(figsize=(8, 5))
-sns.lineplot(x=years, y=agreement_scores, marker='o', linestyle='-', color='b', label="Agreement Score", ax=ax1)
-ax1.set_xlabel("Years")
-ax1.set_ylabel("Agreement Score")
-ax1.set_title("AI Business Ethics Agreement Trends")
-ax1.legend()
-ax1.grid(True)
-st.pyplot(fig1)
+st.subheader("💬 Debate an Ethical Case with AI")
+st.write("Test your ethical reasoning by arguing against AI.")
 
-# ==============================
-# 📜 AI Negotiation Summaries
-# ==============================
-st.subheader("📜 AI Negotiation Summaries")
-for agent in agents:
-    st.write(agent.explain_decision())
-
-# ==============================
-# 💬 AI Chat: Ask AI About Its Decisions
-# ==============================
-st.subheader("💬 Ask AI About Its Decisions")
-user_input = st.text_input("Ask an AI agent about its negotiation strategy:")
+user_input = st.text_input("Your argument against AI’s stance:")
 
 if user_input:
     chosen_agent = random.choice(agents)
-    response = f"🤖 {chosen_agent.name} says: '{chosen_agent.explain_decision()}'"
+    response = f"🤖 {chosen_agent.name} says: 'I respect your argument, but ISCT requires us to prioritize {random.choice(list(hypernorms.keys()))}.'"
     st.write(response)
 
-st.success("Simulation Complete! 🎉 AI systems have finished negotiating.")
+st.success("Simulation Complete! 🎉 AI strictly followed ISCT and explained decisions.")
